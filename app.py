@@ -89,6 +89,11 @@ def find_adb():
 
 
 def find_scrcpy():
+    # Newer releases extract to a versioned folder (scrcpy-win64-vX.Y.Z).
+    for p in sorted(TOOLS_DIR.glob("scrcpy-win64*")):
+        exe = p / "scrcpy.exe"
+        if exe.is_file():
+            return str(exe)
     if (SCRCPY_DIR / "scrcpy.exe").is_file():
         return str(SCRCPY_DIR / "scrcpy.exe")
     return shutil.which("scrcpy")
