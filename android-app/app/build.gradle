@@ -24,17 +24,28 @@ android {
             versionNameSuffix "-full"
         }
         // SkyDrop: no bundled exe (~1 MB) → downloads it from the GitHub release.
+        // This is the Play-store flavor (no executable payload inside the app).
         skyDrop {
             dimension "dist"
             versionNameSuffix "-sky"
         }
     }
 
+    // Release signing: reads android-app/keystore.properties (gitignored, never committed).
+    // Without it the build falls back to the debug key WITH A WARNING — Play rejects
+    // debug-signed uploads, so the store AAB must be built where keystore.properties exists.
+    def ksProps = new Properties()
+    def ksFile = rootProject.file("keystore.properties")
+    if (ksFile.exists()) { ksFile.withInputStream { ksProps.load(it) } }
     signingConfigs {
-        // Release signing via CI secrets if present, else debug key (Play re-signs with App Signing).
-        // Set SIGNING_KEYSTORE_BASE64 / SIGNING_KEY_ALIAS / SIGNING_KEY_PASSWORD / SIGNING_STORE_PASSWORD
-        // as GitHub Actions secrets for a production key. Locally this falls back to debug.
-        debug { }
+        release {
+            if (ksFile.exists()) {
+                storeFile file(ksProps['storeFile'])
+                storePassword ksProps['storePassword']
+                keyAlias ksProps['keyAlias']
+                keyPassword ksProps['keyPassword']
+            }
+        }
     }
 
     buildTypes {
@@ -50,6 +61,12 @@ android {
             // Harmless for our pure-Kotlin app (no .so today).
             ndk {
                 debugSymbolLevel 'FULL'
+            }
+            if (ksFile.exists()) {
+                signingConfig signingConfigs.release
+            } else {
+                signingConfig signingConfigs.debug
+                println("WARNING: keystore.properties missing — release signed with DEBUG key (Play will reject it).")
             }
         }
     }

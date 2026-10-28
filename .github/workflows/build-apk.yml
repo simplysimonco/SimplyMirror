@@ -44,15 +44,14 @@ jobs:
           gradle-version: '8.11.1'
 
       # Full log captured so the exact error survives (--stacktrace --info).
-      - name: Build debug APK + release AAB
-        run: gradle assembleDebug bundleRelease --stacktrace --info 2>&1 | tee gradle-build.log; test ${PIPESTATUS[0]} -eq 0
+      - name: Build debug APKs + release AABs (both flavors)
+        run: gradle assembleFullDropDebug assembleSkyDropDebug bundleFullDropRelease bundleSkyDropRelease --stacktrace --info 2>&1 | tee gradle-build.log; test ${PIPESTATUS[0]} -eq 0
 
       - name: Verify targetSdk >= 36 (fail fast with paste-ready error)
         run: |
-          APK=app/build/outputs/apk/debug/app-debug.apk
-          AAB=app/build/outputs/bundle/release/app-release.aab
-          echo "APK: $APK  AAB: $AAB"
-          ls -lh app/build/outputs/apk/debug/ app/build/outputs/bundle/release/ || true
+          APK=app/build/outputs/apk/skyDrop/debug/app-skyDrop-debug.apk
+          echo "APK: $APK"
+          ls -lh app/build/outputs/apk/fullDrop/debug/ app/build/outputs/apk/skyDrop/debug/ app/build/outputs/bundle/skyDropRelease/ || true
           ANALYZER=""
           for c in "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/apkanalyzer" "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer"; do
             if [ -x "$c" ]; then ANALYZER="$c"; break; fi
@@ -72,26 +71,32 @@ jobs:
           fi
           echo "targetSdk check passed."
 
-      - name: Upload APK (sideload / testing)
+      - name: Upload APKs (sideload / Discord)
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: MirrorHelper-app-debug
-          path: android-app/app/build/outputs/apk/debug/app-debug.apk
+          name: ScreenMirror-APKs
+          path: |
+            android-app/app/build/outputs/apk/fullDrop/debug/app-fullDrop-debug.apk
+            android-app/app/build/outputs/apk/skyDrop/debug/app-skyDrop-debug.apk
 
-      - name: Upload AAB (Play upload)
+      - name: Upload AABs (Play upload)
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: MirrorHelper-release-aab
-          path: android-app/app/build/outputs/bundle/release/app-release.aab
+          name: ScreenMirror-release-aabs
+          path: |
+            android-app/app/build/outputs/bundle/fullDropRelease/app-fullDrop-release.aab
+            android-app/app/build/outputs/bundle/skyDropRelease/app-skyDrop-release.aab
 
       - name: Upload deobfuscation mapping.txt (Play: clears R8 warning)
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: deobfuscation-mapping
-          path: android-app/app/build/outputs/mapping/release/mapping.txt
+          path: |
+            android-app/app/build/outputs/mapping/fullDropRelease/mapping.txt
+            android-app/app/build/outputs/mapping/skyDropRelease/mapping.txt
           if-no-files-found: warn
 
       - name: Upload native-debug-symbols (Play: clears native warning, if any .so)
