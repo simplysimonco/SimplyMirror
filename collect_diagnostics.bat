@@ -18,8 +18,8 @@ echo. >> "%OUT%"
 echo --- tools dir --- >> "%OUT%"
 dir tools 2>> "%OUT%" >> "%OUT%"
 echo. >> "%OUT%"
-echo --- mirror-helper.log tail (80 lines) --- >> "%OUT%"
-powershell -command "if (Test-Path mirror-helper.log) { Get-Content mirror-helper.log -Tail 80 } else { 'no mirror-helper.log yet' }" >> "%OUT%" 2>&1
+echo --- simplymirror.log tail (80 lines) --- >> "%OUT%"
+powershell -command "if (Test-Path simplymirror.log) { Get-Content simplymirror.log -Tail 80 } else { 'no simplymirror.log yet' }" >> "%OUT%" 2>&1
 echo. >> "%OUT%"
 echo --- adb version / devices (tries ./tools first) --- >> "%OUT%"
 if exist "tools\platform-tools\adb.exe" (
@@ -42,5 +42,5 @@ if exist "tools\scrcpy-win64\scrcpy.exe" (
 echo.
 echo Saved to %CD%\%OUT%
 echo Paste the whole file back here for debugging.
-echo Also send: build.log (after build_exe.bat) and mirror-helper.log if present.
+echo Also send: build.log (after build_exe.bat) and simplymirror.log if present.
 pause

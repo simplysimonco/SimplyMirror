@@ -29,11 +29,10 @@ import kotlin.concurrent.thread
 
 class MainActivity : Activity() {
 
-    // TODO: point this at your real release after first exe build.
-    // Suggested: create a GitHub release holding MirrorHelper.exe, use the asset URL.
+    // PC Connector lives in the SimplyMirror GitHub release as SimplyMirror.exe.
     private val PC_EXE_URL =
-        "https://github.com/YOU/YOUR-REPO/releases/latest/download/MirrorHelper.exe"
-    private val PC_EXE_NAME = "MirrorHelper.exe"
+        "https://github.com/simplysimonco/SimplyMirror/releases/latest/download/SimplyMirror.exe"
+    private val PC_EXE_NAME = "SimplyMirror.exe"
 
     private var step = 0 // 0..4
     private lateinit var root: LinearLayout
@@ -90,7 +89,7 @@ class MainActivity : Activity() {
         setContentView(scroll)
 
         val head = TextView(this).apply {
-            text = "Mirror Helper"
+            text = "SimplyMirror"
             textSize = 30f
             setTypeface(typeface, Typeface.BOLD)
             gravity = Gravity.CENTER
@@ -150,7 +149,7 @@ class MainActivity : Activity() {
             val s = try { UsbMonitor.current(this) } catch (e: Exception) { null }
             val prefs = getSharedPreferences(PcConnectedReceiver.PREFS, MODE_PRIVATE)
             val sb = StringBuilder()
-            sb.appendLine("=== Mirror Helper phone diagnostics ===")
+            sb.appendLine("=== SimplyMirror phone diagnostics ===")
             sb.appendLine("Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT}) ${Build.MANUFACTURER} ${Build.MODEL}")
             sb.appendLine("App step=$step pc_connected=${prefs.getBoolean(PcConnectedReceiver.KEY_CONNECTED, false)}")
             sb.appendLine("USB plugged=${s?.usbPlugged} function=${s?.usbFunction} tetherNet=${s?.onTetheringNet}")
@@ -197,7 +196,7 @@ class MainActivity : Activity() {
             }
             1 -> {
                 titleView.text = "Step 2 of 4: Get the computer part ready"
-                bodyView.text = "Your computer needs a small helper (MirrorHelper.exe).\n\n" +
+                bodyView.text = "Your computer needs a small helper (SimplyMirror.exe).\n\n" +
                     "Tap the button below. I will download it and place it where your " +
                     "computer can see it (Download folder). One tap, then wait."
                 actionBtn.visibility = View.VISIBLE
@@ -232,8 +231,8 @@ class MainActivity : Activity() {
                 titleView.text = "Step 4 of 4: One click on the computer"
                 bodyView.text = "Windows never lets a phone install things by itself " +
                     "(virus protection). So there is exactly ONE click left:\n\n" +
-                    "On the COMPUTER open: This PC → your phone → Download → MirrorHelper → " +
-                    "double-click MirrorHelper.exe → click SHOW MY PHONE.\n\n" +
+                    "On the COMPUTER open: This PC → your phone → Download → SimplyMirror → " +
+                    "double-click SimplyMirror.exe → click SHOW MY PHONE.\n\n" +
                     "No File Transfer? Use the backup: turn on USB tethering on this phone, " +
                     "then on the computer open the address below."
                 actionBtn.visibility = View.VISIBLE
@@ -246,9 +245,9 @@ class MainActivity : Activity() {
                     .getBoolean(PcConnectedReceiver.KEY_CONNECTED, false)
                 titleView.text = if (connected) "🎉 Connected!" else "Almost there…"
                 bodyView.text = if (connected)
-                    "Your computer said hello. The mirror window should be open on your PC.\n\nNext time: just plug in and double-click MirrorHelper.exe."
+                    "Your computer said hello. The mirror window should be open on your PC.\n\nNext time: just plug in and double-click SimplyMirror.exe."
                 else
-                    "I have not heard from your computer yet.\n\nDouble-click MirrorHelper.exe on the PC first. " +
+                    "I have not heard from your computer yet.\n\nDouble-click SimplyMirror.exe on the PC first. " +
                     "The moment it runs, this screen turns green automatically."
                 statusView.text = if (connected) "✅ PC handshake received." else "Waiting for PC…"
             }
@@ -272,8 +271,8 @@ class MainActivity : Activity() {
         // 1. private storage (always writable)
         val priv = File(getExternalFilesDir(null), PC_EXE_NAME)
         if (priv.exists() && priv.length() > 1_000_000) return priv
-        // 2. public Download/MirrorHelper (visible over MTP on PC)
-        val pub = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "MirrorHelper/$PC_EXE_NAME")
+        // 2. public Download/SimplyMirror (visible over MTP on PC)
+        val pub = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "SimplyMirror/$PC_EXE_NAME")
         if (pub.exists() && pub.length() > 1_000_000) return pub
         return null
     }
@@ -321,7 +320,7 @@ class MainActivity : Activity() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val values = ContentValues().apply {
                     put(MediaStore.Downloads.DISPLAY_NAME, PC_EXE_NAME)
-                    put(MediaStore.Downloads.RELATIVE_PATH, "Download/MirrorHelper")
+                    put(MediaStore.Downloads.RELATIVE_PATH, "Download/SimplyMirror")
                     put(MediaStore.Downloads.MIME_TYPE, "application/octet-stream")
                 }
                 val uri: Uri? = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
@@ -330,13 +329,13 @@ class MainActivity : Activity() {
                 }
             } else {
                 @Suppress("DEPRECATION")
-                val pub = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "MirrorHelper/$PC_EXE_NAME")
+                val pub = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "SimplyMirror/$PC_EXE_NAME")
                 pub.parentFile?.mkdirs()
                 src.copyTo(pub, overwrite = true)
             }
         } catch (e: Exception) {
             // Non-fatal: private copy still lets the HTTP-server path work.
-            android.util.Log.w("MirrorHelper", "public copy failed: $e")
+            android.util.Log.w("SimplyMirror", "public copy failed: $e")
         }
     }
 

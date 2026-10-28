@@ -1,5 +1,5 @@
 """
-Mirror Helper — beginner edition (Windows + Android)
+SimplyMirror — beginner edition (Windows + Android)
 Double-click the .exe, follow the 4 pictures/steps. No typing needed.
 
 - Page 1 = Welcome / what you need
@@ -27,7 +27,7 @@ import datetime
 import platform
 
 if getattr(sys, "frozen", False):
-    # Running as MirrorHelper.exe: writable folder = folder with the .exe
+    # Running as SimplyMirror.exe: writable folder = folder with the .exe
     APP_DIR = Path(sys.executable).parent
     # companion.html is bundled inside the exe (--add-data), fallback to next to exe
     _bundled = Path(getattr(sys, "_MEIPASS", str(APP_DIR))) / "phone_companion" / "companion.html"
@@ -40,7 +40,7 @@ else:
 TOOLS_DIR = APP_DIR / "tools"
 SCRCPY_DIR = TOOLS_DIR / "scrcpy-win64"
 PLATFORM_TOOLS_DIR = TOOLS_DIR / "platform-tools"
-LOG_FILE = APP_DIR / "mirror-helper.log"
+LOG_FILE = APP_DIR / "simplymirror.log"
 
 
 def log_to_file(msg):
@@ -120,7 +120,7 @@ def get_lan_ip():
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Mirror Helper — Show my phone on my PC")
+        self.title("SimplyMirror — Show my phone on my PC")
         self.geometry("720x780")
         self.scrcpy_proc = None
         self.phone_server = None
@@ -422,7 +422,7 @@ class App(tk.Tk):
         """Build a paste-ready error report + save full log file."""
         try:
             lines = []
-            lines.append("=== Mirror Helper error report ===")
+            lines.append("=== SimplyMirror error report ===")
             lines.append(f"Time: {datetime.datetime.now()}")
             lines.append(f"OS: {platform.system()} {platform.release()} ({platform.version()})")
             lines.append(f"Frozen exe: {bool(getattr(sys, 'frozen', False))} | Python: {sys.version.split()[0]}")

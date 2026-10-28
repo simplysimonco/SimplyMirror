@@ -3,7 +3,7 @@
 ## Direction (new): phone leads, PC follows
 
 1. User installs APK on Android first. All hand-holding lives in the phone app.
-2. Phone prepares the PC package (downloads `MirrorHelper.exe` once, stages it where the PC can see it).
+2. Phone prepares the PC package (downloads `SimplyMirror.exe` once, stages it where the PC can see it).
 3. User plugs USB-C phone -> PC. Phone detects USB, walks user to ONE click on PC.
 4. PC Connector runs, signals back to phone over adb, mirror starts.
 
@@ -19,7 +19,7 @@ Any product claiming "plug phone, PC auto-installs, no click" is either:
 
 So we implement the honest version that *feels* like a push:
 
-- APK copies `MirrorHelper.exe` to public `Download/MirrorHelper/` (visible on PC
+- APK copies `SimplyMirror.exe` to public `Download/MirrorHelper/` (visible on PC
   instantly via MTP as `This PC > Phone > Download > MirrorHelper`).
 - APK optionally starts a USB-tethering web server (`http://192.168.42.129:8080`)
   serving the same exe — backup path if MTP is confusing.
@@ -71,8 +71,8 @@ add `mapping.txt` under "Deobfuscation files" -> add symbols under
 
 ```
 [APK first launch]
-  -> download MirrorHelper.exe from GitHub Releases to app storage
-  -> copy to Download/MirrorHelper/MirrorHelper.exe (MediaStore, visible over MTP)
+  -> download SimplyMirror.exe from GitHub Releases to app storage
+  -> copy to Download/MirrorHelper/SimplyMirror.exe (MediaStore, visible over MTP)
   -> show Step 2: "plug USB-C now"
 [USB plugged]
   -> UsbMonitor detects state, prompts File Transfer + Allow RSA
