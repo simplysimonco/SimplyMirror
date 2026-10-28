@@ -17,7 +17,7 @@ if errorlevel 1 (
 )
 
 echo [2/3] Building SimplyMirror.exe with PyInstaller...
-py -m PyInstaller --onefile --windowed --name SimplyMirror --add-data "phone_companion;phone_companion" app.py >> "%LOG%" 2>&1
+py -m PyInstaller --onefile --windowed --name SimplyMirror --icon app-icon.ico --add-data "phone_companion;phone_companion" app.py >> "%LOG%" 2>&1
 if errorlevel 1 (
   echo BUILD FAILED at PyInstaller. See build.log and build\SimplyMirror\warn-*.txt >> "%LOG%" 2>&1
   echo FAILED at PyInstaller.
