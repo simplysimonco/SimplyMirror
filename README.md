@@ -5,7 +5,9 @@ Plug your phone into your computer with a USB cable → your phone screen + audi
 ## Downloads (get these from [Releases](../../releases))
 
 - **PC (Windows):** `SimplyMirror.exe` — single file, nothing to install. Double-click to run.
-- **Phone (Android):** `SimplyMirror-app-debug.apk` — install on your phone (allow "install unknown apps" once).
+- **Phone (Android) — pick one:**
+  - `ScreenMirror-FullDrop.apk` (~34 MB) — PC helper built in, works even offline.
+  - `ScreenMirror-SkyDrop.apk` (~1 MB) — tiny, downloads the PC helper on first run.
 
 You need: a Windows PC, an Android phone, and a USB **data** cable (the one from the box — cheap charge-only cables won't work).
 
