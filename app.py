@@ -418,8 +418,11 @@ class App(tk.Tk):
         adb = find_adb()
         if not adb:
             return
+        # Explicit component (-n): Android 8+ ignores implicit broadcasts
+        # to manifest receivers, so the package/class must be named.
         _, out = run_cmd([adb, "shell", "am", "broadcast",
-                          "-a", "com.mirrorhelper.PC_CONNECTED"])
+                          "-a", "com.mirrorhelper.PC_CONNECTED",
+                          "-n", "com.mirrorhelper.app/.PcConnectedReceiver"])
         self.log("Handshake → phone: com.mirrorhelper.PC_CONNECTED")
         self.log(out.strip()[:500])
 

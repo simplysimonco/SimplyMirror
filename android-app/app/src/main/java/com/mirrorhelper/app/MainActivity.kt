@@ -61,6 +61,12 @@ class MainActivity : Activity() {
             registerReceiver(usbReceiver, IntentFilter("android.hardware.usb.action.USB_STATE"))
         }
         render()
+        // Cold start from the PC handshake (receiver fires startActivity on a
+        // dead process): onNewIntent won't run, so check the launch intent too.
+        if (intent?.action == PcConnectedReceiver.ACTION) {
+            step = 4
+            render()
+        }
         thread { stagedExe = findStagedExe() }
     }
 
