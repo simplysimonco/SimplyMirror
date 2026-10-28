@@ -16,6 +16,20 @@ android {
         versionName "1.0.1"
     }
 
+    flavorDimensions += "dist"
+    productFlavors {
+        // FullDrop: SimplyMirror.exe lives in src/fullDrop/assets → works fully offline.
+        fullDrop {
+            dimension "dist"
+            versionNameSuffix "-full"
+        }
+        // SkyDrop: no bundled exe (~1 MB) → downloads it from the GitHub release.
+        skyDrop {
+            dimension "dist"
+            versionNameSuffix "-sky"
+        }
+    }
+
     signingConfigs {
         // Release signing via CI secrets if present, else debug key (Play re-signs with App Signing).
         // Set SIGNING_KEYSTORE_BASE64 / SIGNING_KEY_ALIAS / SIGNING_KEY_PASSWORD / SIGNING_STORE_PASSWORD
