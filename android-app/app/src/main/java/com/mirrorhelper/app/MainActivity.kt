@@ -285,28 +285,46 @@ class MainActivity : Activity() {
 
     private fun preparePcPackage() {
         progress.visibility = View.VISIBLE
-        statusView.text = "Downloading… please wait (one time, ~30 MB)."
+        statusView.text = "Getting the computer helper… please wait (one time, ~30 MB)."
         thread {
             try {
                 val priv = File(getExternalFilesDir(null), PC_EXE_NAME)
-                if (!priv.exists() || priv.length() < 1_000_000) {
-                    downloadTo(PC_EXE_URL, priv)
+                var source = "download"
+                try {
+                    if (!priv.exists() || priv.length() < 1_000_000) {
+                        downloadTo(PC_EXE_URL, priv)
+                    }
+                } catch (e: Exception) {
+                    // Offline or blocked network: fall back to the copy bundled inside this APK.
+                    android.util.Log.w("SimplyMirror", "download failed, trying built-in copy: $e")
+                    extractBundledExe(priv)
+                    source = "built-in copy (offline mode — connect to WiFi later for updates)"
                 }
                 stagedExe = priv
                 copyToPublicDownload(priv)
                 runOnUiThread {
                     progress.visibility = View.GONE
-                    statusView.text = "✅ Ready: placed where your computer can see it.\nNow go to Step 3 (plug in)."
+                    statusView.text = "✅ Ready ($source): placed where your computer can see it.\nNow go to Step 3 (plug in)."
                     Toast.makeText(this, "Computer helper is ready", Toast.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
                 runOnUiThread {
                     progress.visibility = View.GONE
-                    statusView.text = "Download failed: ${e.message}\n\n" +
+                    statusView.text = "Could not get the helper: ${e.message}\n\n" +
                         "Fix: connect phone to WiFi and try again. URL:\n$PC_EXE_URL"
                 }
             }
         }
+    }
+
+    /** Copies SimplyMirror.exe bundled in app/src/main/assets (no internet needed). */
+    private fun extractBundledExe(dest: File) {
+        if (dest.exists() && dest.length() > 1_000_000) return
+        dest.parentFile?.mkdirs()
+        assets.open(PC_EXE_NAME).use { input ->
+            FileOutputStream(dest).use { output -> input.copyTo(output) }
+        }
+        if (!dest.exists() || dest.length() < 1_000_000) throw Exception("built-in copy missing or corrupt")
     }
 
     private fun downloadTo(url: String, dest: File) {
