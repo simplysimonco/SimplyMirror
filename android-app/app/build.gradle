@@ -1,0 +1,58 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.mirrorhelper.app'
+    // Play requirement (same bar as SimplyTimer v9): must target 36+.
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.mirrorhelper.app"
+        minSdk 26
+        targetSdk 36
+        versionCode 2
+        versionName "1.0.1"
+    }
+
+    signingConfigs {
+        // Release signing via CI secrets if present, else debug key (Play re-signs with App Signing).
+        // Set SIGNING_KEYSTORE_BASE64 / SIGNING_KEY_ALIAS / SIGNING_KEY_PASSWORD / SIGNING_STORE_PASSWORD
+        // as GitHub Actions secrets for a production key. Locally this falls back to debug.
+        debug { }
+    }
+
+    buildTypes {
+        debug { }
+        release {
+            // Generates mapping.txt -> upload to Play to clear the
+            // "no deobfuscation file" warning.
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Generates native-debug-symbols.zip if any .so appears ->
+            // upload to Play to clear the "no debug symbols" warning.
+            // Harmless for our pure-Kotlin app (no .so today).
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = '17' }
+
+    bundle {
+        language { enableSplit = true }
+        density { enableSplit = true }
+        abi { enableSplit = true }
+    }
+}
+
+dependencies {
+    // No external deps on purpose — stdlib only so the APK builds anywhere.
+    // No native .so -> no "debug symbols" warning on Play.
+}

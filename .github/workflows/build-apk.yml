@@ -1,0 +1,115 @@
+name: Build APK + AAB (Play: target 36)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'android-app/**'
+      - '.github/workflows/build-apk.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android-app
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install API 36 platform + build-tools
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platforms;android-36" "build-tools;36.0.0" "cmdline-tools;latest"
+          sdkmanager --list_installed | tail -20
+
+      - name: Environment info (for debugging)
+        run: |
+          java -version 2>&1
+          echo "--- installed ---"
+          sdkmanager --list_installed 2>&1 | head -50 || true
+        continue-on-error: true
+
+      - name: Set up Gradle
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: '8.11.1'
+
+      # Full log captured so the exact error survives (--stacktrace --info).
+      - name: Build debug APK + release AAB
+        run: gradle assembleDebug bundleRelease --stacktrace --info 2>&1 | tee gradle-build.log; test ${PIPESTATUS[0]} -eq 0
+
+      - name: Verify targetSdk >= 36 (fail fast with paste-ready error)
+        run: |
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          AAB=app/build/outputs/bundle/release/app-release.aab
+          echo "APK: $APK  AAB: $AAB"
+          ls -lh app/build/outputs/apk/debug/ app/build/outputs/bundle/release/ || true
+          ANALYZER=""
+          for c in "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/apkanalyzer" "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer"; do
+            if [ -x "$c" ]; then ANALYZER="$c"; break; fi
+          done
+          echo "apkanalyzer: ${ANALYZER:-NOT FOUND}"
+          if [ -n "$ANALYZER" ] && [ -f "$APK" ]; then
+            TARGET=$("$ANALYZER" manifest target-sdk "$APK" 2>/dev/null | tr -d '\r\n' || true)
+            echo "targetSdk (APK) = $TARGET"
+            if [ -n "$TARGET" ] && [ "$TARGET" -lt 36 ]; then
+              echo "::error::targetSdk is $TARGET, Play requires >= 36. Fix app/build.gradle targetSdk 36."
+              exit 1
+            fi
+          else
+            echo "Skipping binary check (no analyzer); checking source instead:"
+            grep -H "targetSdk" app/build.gradle
+            grep -q "targetSdk 36" app/build.gradle || (echo "::error::targetSdk 36 not found in app/build.gradle" && exit 1)
+          fi
+          echo "targetSdk check passed."
+
+      - name: Upload APK (sideload / testing)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MirrorHelper-app-debug
+          path: android-app/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Upload AAB (Play upload)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MirrorHelper-release-aab
+          path: android-app/app/build/outputs/bundle/release/app-release.aab
+
+      - name: Upload deobfuscation mapping.txt (Play: clears R8 warning)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deobfuscation-mapping
+          path: android-app/app/build/outputs/mapping/release/mapping.txt
+          if-no-files-found: warn
+
+      - name: Upload native-debug-symbols (Play: clears native warning, if any .so)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-debug-symbols
+          path: android-app/app/build/outputs/native-debug-symbols/**/*.zip
+          if-no-files-found: ignore
+
+      # ALWAYS runs, even on failure — this is what you paste back.
+      - name: Upload build logs + reports (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: |
+            android-app/gradle-build.log
+            android-app/app/build/reports
+            android-app/app/build/outputs/logs
+          if-no-files-found: warn

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Mirror Helper - Phone Setup</title>
+<style>
+  body { font-family: sans-serif; margin: 0; padding: 16px; background: #f2f5ff; color: #111; font-size: 19px; line-height: 1.5; }
+  h1 { font-size: 24px; text-align: center; }
+  .card { background: white; border-radius: 14px; padding: 16px; margin: 12px 0; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+  .step-num { background: #2563eb; color: white; width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 8px; }
+  .big-btn { display: block; width: 100%; padding: 16px; font-size: 20px; font-weight: bold; border: none; border-radius: 12px; background: #2563eb; color: white; margin: 10px 0; text-align: center; text-decoration: none; }
+  .green { background: #16a34a; }
+  label.check { display: flex; gap: 10px; align-items: flex-start; background: #eef2ff; padding: 12px; border-radius: 10px; margin: 8px 0; }
+  input[type=checkbox] { width: 26px; height: 26px; margin-top: 2px; }
+  .small { font-size: 16px; color: #444; }
+  .done { text-align: center; font-size: 22px; font-weight: bold; color: #16a34a; display: none; }
+</style>
+</head>
+<body>
+<h1>📱 Mirror Helper<br><span class="small">Phone setup — do once, 5 minutes</span></h1>
+
+<div class="card">
+  <div><span class="step-num">1</span><b>Turn on the hidden switch</b></div>
+  <p>Your phone hides a switch called <b>USB debugging</b>. It just means “let my computer show my screen”. It is safe on your own computer.</p>
+  <a class="big-btn" href="intent:#Intent;action=android.settings.APPLICATION_DEVELOPMENT_SETTINGS;end">Open Settings for me</a>
+  <p class="small">If that button does nothing, do it by hand:<br>
+  Settings → About phone → tap <b>Build number 7 times</b> → go back → System → Developer options → turn <b>USB debugging ON</b>.</p>
+  <label class="check"><input type="checkbox" id="c1"> I turned USB debugging ON</label>
+</div>
+
+<div class="card">
+  <div><span class="step-num">2</span><b>Plug the cable correctly</b></div>
+  <p>Use the cable that came with your phone. Some cheap cables only charge — they will not work.</p>
+  <p>Plug phone → computer. On your phone, swipe down from the top, tap <b>USB / Charging</b> → choose <b>File Transfer</b>.</p>
+  <label class="check"><input type="checkbox" id="c2"> Cable plugged in, File Transfer chosen</label>
+</div>
+
+<div class="card">
+  <div><span class="step-num">3</span><b>Say “Allow” on your phone</b></div>
+  <p>Your phone will pop up: <b>“Allow USB debugging?”</b></p>
+  <p>Tick <b>Always allow</b> → tap <b>Allow</b>.</p>
+  <p class="small">No popup? Unplug, plug again, then look at your phone. Unlock it first.</p>
+  <label class="check"><input type="checkbox" id="c3"> I tapped Allow</label>
+</div>
+
+<div class="card">
+  <div><span class="step-num">4</span><b>Back to computer</b></div>
+  <p>On your computer, click the big green button <b>SHOW MY PHONE ON PC NOW</b>. Your screen + sound appear.</p>
+  <label class="check"><input type="checkbox" id="c4"> It worked — I see my phone on PC!</label>
+</div>
+
+<div class="done" id="done">🎉 All done! From now on just plug in + click one button.</div>
+
+<div class="card">
+  <b>Keep this helper like an app:</b>
+  <p class="small">Chrome: tap ⋮ → Add to Home screen → Add.<br>Samsung Internet: tap ☰ → Add page to → Home screen.</p>
+</div>
+
+<script>
+  const ids = ['c1','c2','c3','c4'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    el.checked = localStorage.getItem(id) === '1';
+    el.onchange = () => {
+      localStorage.setItem(id, el.checked ? '1' : '0');
+      const all = ids.every(i => document.getElementById(i).checked);
+      document.getElementById('done').style.display = all ? 'block' : 'none';
+    };
+  });
+  document.getElementById('done').style.display = ids.every(i => document.getElementById(i).checked) ? 'block' : 'none';
+</script>
+</body>
+</html>

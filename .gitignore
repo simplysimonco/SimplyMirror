@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.log
+
+# PyInstaller work + output (ships via GitHub Release, not git)
+build/
+dist/
+tools/
+*.spec
+
+# Diagnostics generated on user machines
+diagnostics-report.txt
+diagnostics-pc.txt
+mirror-helper.log
+build.log
+
+# Android local build
+android-app/app/build/
+android-app/.gradle/
+android-app/local.properties
+android-app/gradle-local-build.log
+*.apk
+*.aab
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
