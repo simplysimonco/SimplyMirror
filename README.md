@@ -1,24 +1,30 @@
-# SimplyMirror — beginner edition
+# SimplyMirror — show your Android phone on your PC, with sound
 
-## For the person using it (no computer skills needed)
-1. Double-click `SimplyMirror.exe` (single file, nothing to install).
-2. Click the big green `✨ DO EVERYTHING FOR ME ✨` button.
-3. Follow the 4 steps on screen — it ticks them off for you.
-4. Click `▶ SHOW MY PHONE ON PC NOW`. Done.
+Plug your phone into your computer with a USB cable → your phone screen + audio appear on the PC, controllable with mouse and keyboard. First setup takes ~5 minutes, afterwards it's one click.
 
-First time = 5 minutes. Next time = plug cable + double-click + SHOW.
+## Downloads (get these from [Releases](../../releases))
 
-## Phone companion (looks like an app, no store needed)
-1. On PC app: click `Start phone helper`.
-2. On phone (SAME WiFi as PC): open Camera → scan QR, or type the address shown.
-3. In Chrome tap ⋮ → Add to Home screen → now you have a SimplyMirror icon like a real app.
-4. Companion works offline after that (steps saved).
+- **PC (Windows):** `SimplyMirror.exe` — single file, nothing to install. Double-click to run.
+- **Phone (Android):** `SimplyMirror-app-debug.apk` — install on your phone (allow "install unknown apps" once).
 
-## For you (the builder — one time)
-```
-build_exe.bat
-```
-Makes `dist\SimplyMirror.exe`. Send that one file to anyone.
-Include `phone_companion/companion.html` next to it (auto-served by the app, no hosting needed).
+You need: a Windows PC, an Android phone, and a USB **data** cable (the one from the box — cheap charge-only cables won't work).
 
-No DVI cable needed: laptop USB-C is video-OUT, DVI has no sound. This uses USB-data so screen + sound both work.
+## Friend-proof setup (5 min, once)
+
+1. Install the APK on your phone, open **SimplyMirror**, tap through the 4 big steps (it tells you exactly what to tap, including the hidden "tap Build number 7 times" switch).
+2. Plug USB-C: phone → computer. On the phone pick **File Transfer**, tap **Allow** on the permission popup.
+3. On the PC, run `SimplyMirror.exe` → click **SHOW MY PHONE ON PC NOW**. Done — next time just plug in + SHOW.
+
+No USB-C video cable needed (laptop USB-C ports are video-OUT only, and DVI carries no sound). This mirrors over USB-data, so screen **and** audio both work.
+
+## What's in this repo
+
+- `app.py` → the PC Connector (built to `SimplyMirror.exe`, single-file, no install)
+- `android-app/` → the phone companion APK source (Kotlin, targets API 36 for Play compliance)
+- `phone_companion/` → printable/setup helper page served by the PC app over WiFi
+- `.github/workflows/` → cloud build for APK + Play bundle (AAB) with deobfuscation mapping
+
+## Sharing / testing
+
+- Friends only need the two files from **Releases** — no Python, no Android Studio, nothing to build.
+- Found a bug? PC app → **📋 Copy error report** button, phone app → same button — paste the text into an issue.
